@@ -1,0 +1,7 @@
+FROM python:3.11.8-slim-bullseye
+WORKDIR /oculus
+COPY . /oculus
+RUN apt update && apt upgrade -y && apt install git build-essential -y && \
+    pip install -r /oculus/requirements.txt 
+WORKDIR /oculus/oculusAuditor
+CMD ["python3", "realTimeNotification.py", "-c", "true", "-gh", "true", "-sl", "true"]

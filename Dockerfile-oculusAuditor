@@ -1,0 +1,16 @@
+FROM golang:1.22.0 AS builder
+WORKDIR /oculus
+COPY . /oculus
+WORKDIR /oculus/gitleaks
+RUN apt update && apt upgrade -y && apt install make build-essential -y
+RUN go install golang.org/x/lint/golint@latest
+RUN GOOS=linux GOARCH=arm64 CGO_ENABLED=0 go build -o gitleaks main.go
+
+FROM python:3.12-slim-bullseye
+WORKDIR /oculus
+COPY . /oculus
+COPY --from=builder /oculus/gitleaks/gitleaks /usr/bin/
+RUN apt update && apt upgrade -y && apt install git build-essential -y && \
+    pip install -r /oculus/requirements.txt && chmod +x /usr/bin/gitleaks
+WORKDIR /oculus/oculusAuditor
+CMD ["python3", "oculusAuditor.py", "-gh", "true", "-c", "true", "-db", "true"]

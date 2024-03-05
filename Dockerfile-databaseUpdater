@@ -1,0 +1,6 @@
+FROM python:3.12-slim-bullseye
+WORKDIR /oculus
+COPY . /oculus
+RUN apt update && apt upgrade -y && apt install git build-essential -y && pip install -r /oculus/requirements.txt
+WORKDIR /oculus/oculusAuditor
+CMD ["python3", "databaseUpdater.py", "-gh", "true", "-c", "true"]
